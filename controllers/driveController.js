@@ -63,8 +63,8 @@
 
 const drive = require("../config/drive");
 
-const FOLDER_ID_CDR = "1SVKxtpmC82A2bKt93jx4rcg6ndOgmRDL";
-const FOLDER_ID_IMAGES = "14aU0Rl4_h_6Nt7fste4TJpUCNJXu3jsl";
+const FOLDER_ID_CDR = process.env.DRIVE_FOLDER_ID_CDR;
+const FOLDER_ID_IMAGES = process.env.DRIVE_FOLDER_ID_IMAGES;
 
 /* ---------------------------------------------------
    GET ALL CDR FILES
