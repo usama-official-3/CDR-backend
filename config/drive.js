@@ -1,22 +1,22 @@
+// config/drive.js
 const { google } = require("googleapis");
-
-if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
-  throw new Error("GOOGLE_SERVICE_ACCOUNT_JSON is not defined!");
-}
-
-let credentials;
-try {
-  credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-} catch (err) {
-  console.error("Failed to parse service account JSON:", err);
-  throw err;
-}
+const privateKey = process.env.GOOGLE_PRIVATE_KEY;
 
 const auth = new google.auth.GoogleAuth({
-  credentials,
+  credentials: {
+    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+    private_key: privateKey.includes("\\n")
+      ? privateKey.replace(/\\n/g, "\n")
+      : privateKey,
+  },
   scopes: ["https://www.googleapis.com/auth/drive"],
 });
 
-const drive = google.drive({ version: "v3", auth });
+console.log("PRIVATE KEY START:", process.env.GOOGLE_PRIVATE_KEY?.slice(0, 30));
+console.log("FOLDER IMG:", process.env.DRIVE_FOLDER_ID_IMAGES);
+const drive = google.drive({
+  version: "v3",
+  auth,
+});
 
 module.exports = drive;
