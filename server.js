@@ -44,7 +44,7 @@ app.use(express.json());
 
 /* ROUTES */
 app.get("/", (req, res) => {
-  res.send("Backend API is running");
+  res.send("Backend API is running Now");
 });
 app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
