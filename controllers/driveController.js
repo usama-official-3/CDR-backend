@@ -62,6 +62,7 @@
 // };
 
 const drive = require("../config/drive");
+const sharp = require("sharp");
 
 const FOLDER_ID_CDR = process.env.DRIVE_FOLDER_ID_CDR;
 const FOLDER_ID_IMAGES = process.env.DRIVE_FOLDER_ID_IMAGES;
@@ -125,18 +126,51 @@ exports.getImages = async (req, res) => {
 /* ---------------------------------------------------
    STREAM IMAGE
 --------------------------------------------------- */
+// exports.getImage = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const response = await drive.files.get(
+//       { fileId: id, alt: "media" },
+//       { responseType: "stream" }
+//     );
+
+//     res.setHeader("Content-Type", "image/jpeg");
+
+//     response.data.pipe(res);
+
+//   } catch (error) {
+//     console.error("Drive getImage error:", error.message);
+//     res.status(500).send("Error loading image");
+//   }
+// };
 exports.getImage = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // ✅ query params (optional)
+    const width = parseInt(req.query.w) || 400;
+    const quality = parseInt(req.query.q) || 70;
+
+    // Get image from Google Drive
     const response = await drive.files.get(
       { fileId: id, alt: "media" },
-      { responseType: "stream" }
+      { responseType: "arraybuffer" }
     );
 
-    res.setHeader("Content-Type", "image/jpeg");
+    const buffer = Buffer.from(response.data);
 
-    response.data.pipe(res);
+    // ✅ Resize + compress
+    const optimized = await sharp(buffer)
+      .resize({ width })
+      .webp({ quality }) 
+      .toBuffer();
+
+    // ✅ Headers
+    res.setHeader("Content-Type", "image/webp");
+    res.setHeader("Cache-Control", "public, max-age=31536000"); 
+
+    res.send(optimized);
 
   } catch (error) {
     console.error("Drive getImage error:", error.message);
